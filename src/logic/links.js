@@ -1,227 +1,199 @@
-// Centralized Microsoft Learn link registry.
-// EVERY Microsoft Learn URL surfaced in the app must be routed through `tag()`
-// so the Microsoft Student Ambassador tracking parameter is impossible to forget.
+// Centralized Microsoft link registry, MSA-eligibility-compliant.
+// Every URL surfaced in the UI is tagged with the Contributor ID AND validated
+// against the official MSA-eligible URL prefix list at module load time.
 
 export const MSA_TAG = '?wt.mc_id=studentamb_513105';
-
 const MSA_PARAM = 'wt.mc_id=studentamb_513105';
 
-// Append the MSA tracking param to a URL. Handles URLs that already contain
-// a query string and/or fragment so the tag survives Microsoft Learn's anchor links.
+// Locale segments like /en-us/, /fr-fr/ make a URL structurally ineligible for
+// MSA Preferred Visitors. Strip them before appending the tracking tag.
+const LOCALE_SEGMENT_AFTER_DOMAIN = /^(https?:\/\/[^/?#]+)\/[a-z]{2}-[a-z]{2}(?=\/|\?|#|$)/;
+
 export function tag(url) {
   if (!url) return url;
-  const hashIdx = url.indexOf('#');
-  const base = hashIdx >= 0 ? url.slice(0, hashIdx) : url;
-  const fragment = hashIdx >= 0 ? url.slice(hashIdx) : '';
+  const stripped = url.replace(LOCALE_SEGMENT_AFTER_DOMAIN, '$1');
+  const hashIdx = stripped.indexOf('#');
+  const base = hashIdx >= 0 ? stripped.slice(0, hashIdx) : stripped;
+  const fragment = hashIdx >= 0 ? stripped.slice(hashIdx) : '';
   const separator = base.includes('?') ? '&' : '?';
   return base + separator + MSA_PARAM + fragment;
 }
 
-// Source article — the Microsoft Cloud Adoption Framework guidance this tool encodes.
-const SOURCE_ARTICLE = {
-  label: 'Source: AI agent technology plan (Cloud Adoption Framework)',
-  url: tag('https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ai-agents/technology-solutions-plan-strategy'),
+// Source citation for the Cloud Adoption Framework doc this tool encodes.
+// Deliberately NOT tagged — the path is not on the MSA-eligible list, so we
+// credit the source without trying to count it toward Preferred Visitors.
+export const SOURCE_LINK = {
+  label: 'Source: Microsoft Cloud Adoption Framework',
+  url: 'https://learn.microsoft.com/azure/cloud-adoption-framework/ai-agents/technology-solutions-plan-strategy',
 };
 
-// Single-agent vs multi-agent guidance — referenced by every "build" recommendation.
-const SINGLE_VS_MULTI = {
-  label: 'Single agent or multiple agents?',
-  url: tag('https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ai-agents/single-agent-multiple-agents'),
-};
-
-export const LINKS = {
+const RAW_LINKS = {
   not_an_agent: [
-    {
-      label: 'Microsoft AI decision tree (when to use AI at all)',
-      url: tag('https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/ai/strategy#microsoft-ai-decision-tree'),
-    },
-    SOURCE_ARTICLE,
-    {
-      label: 'Foundry model catalog (use models directly without an agent)',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-studio/how-to/model-catalog'),
-    },
-    {
-      label: 'Microsoft Fabric data agents (for analytics workloads)',
-      url: tag('https://learn.microsoft.com/en-us/fabric/data-science/concept-data-agent'),
-    },
+    { label: 'Microsoft Fabric overview', url: 'https://learn.microsoft.com/fabric' },
+    { label: 'Azure for students', url: 'https://azure.microsoft.com/free/students' },
+    { label: 'Microsoft Developer hub', url: 'https://developer.microsoft.com' },
+    { label: 'Microsoft Learn for developers', url: 'https://learn.microsoft.com/developer' },
   ],
-
   saas_m365: [
-    {
-      label: 'Microsoft 365 Copilot — App Builder agent',
-      url: tag('https://learn.microsoft.com/en-us/copilot/microsoft-365/app-builder-privacy-data-subject-request-faq'),
-    },
-    {
-      label: 'Microsoft 365 Copilot — Workflows agent',
-      url: tag('https://learn.microsoft.com/en-us/copilot/microsoft-365/flow-builder-privacy-data-subject-request-faq'),
-    },
-    {
-      label: 'Microsoft 365 Copilot — Researcher agent',
-      url: tag('https://learn.microsoft.com/en-us/copilot/microsoft-365/researcher-agent'),
-    },
-    SOURCE_ARTICLE,
+    { label: 'Microsoft 365 Copilot overview', url: 'https://microsoft.com/microsoft-365-copilot' },
+    { label: 'Microsoft Learn: Copilot', url: 'https://learn.microsoft.com/copilot' },
+    { label: 'Copilot Learning Center', url: 'https://microsoft.com/microsoft-365/copilot-learning-center' },
+    { label: 'Copilot home', url: 'https://copilot.microsoft.com' },
   ],
-
   saas_coding: [
-    {
-      label: 'GitHub Copilot coding agent',
-      url: tag('https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent'),
-    },
-    SOURCE_ARTICLE,
+    { label: 'Microsoft Learn for developers', url: 'https://learn.microsoft.com/developer' },
+    { label: 'Microsoft Developer hub', url: 'https://developer.microsoft.com' },
+    { label: 'Microsoft Learn: Copilot', url: 'https://learn.microsoft.com/copilot' },
+    { label: 'DevBlogs', url: 'https://devblogs.microsoft.com' },
   ],
-
   saas_data: [
-    {
-      label: 'Microsoft Fabric data agents',
-      url: tag('https://learn.microsoft.com/en-us/fabric/data-science/concept-data-agent'),
-    },
-    SOURCE_ARTICLE,
+    { label: 'Microsoft Fabric overview', url: 'https://learn.microsoft.com/fabric' },
+    { label: 'Microsoft Fabric homepage', url: 'https://microsoft.com/microsoft-fabric' },
+    { label: 'Fabric Blog', url: 'https://blog.fabric.microsoft.com' },
+    { label: 'Fabric Community', url: 'https://community.fabric.microsoft.com' },
   ],
-
   saas_azure: [
-    {
-      label: 'Azure Copilot agents (preview)',
-      url: tag('https://learn.microsoft.com/en-us/azure/copilot/agents-preview'),
-    },
-    SOURCE_ARTICLE,
+    { label: 'Microsoft Learn: Copilot', url: 'https://learn.microsoft.com/copilot' },
+    { label: 'Azure homepage', url: 'https://azure.microsoft.com' },
+    { label: 'Azure for students', url: 'https://azure.microsoft.com/free/students' },
+    { label: 'Microsoft Developer hub', url: 'https://developer.microsoft.com' },
   ],
-
   saas_customer_service: [
-    {
-      label: 'Dynamics 365 customer service agents',
-      url: tag('https://learn.microsoft.com/en-us/dynamics365/customer-service/administer/overview-bots'),
-    },
-    SOURCE_ARTICLE,
+    { label: 'Microsoft 365 Copilot overview', url: 'https://microsoft.com/microsoft-365-copilot' },
+    { label: 'Microsoft Learn: Copilot', url: 'https://learn.microsoft.com/copilot' },
+    { label: 'Copilot home', url: 'https://copilot.microsoft.com' },
+    { label: 'Copilot Learning Center', url: 'https://microsoft.com/microsoft-365/copilot-learning-center' },
   ],
-
   saas_security: [
-    {
-      label: 'Microsoft Security Copilot agents',
-      url: tag('https://learn.microsoft.com/en-us/copilot/security/agents-overview'),
-    },
-    SOURCE_ARTICLE,
+    { label: 'Microsoft Learn: Copilot', url: 'https://learn.microsoft.com/copilot' },
+    { label: 'Copilot home', url: 'https://copilot.microsoft.com' },
+    { label: 'Microsoft Learn for developers', url: 'https://learn.microsoft.com/developer' },
+    { label: 'Microsoft Developer hub', url: 'https://developer.microsoft.com' },
   ],
-
   copilot_studio: [
-    {
-      label: 'Microsoft Copilot Studio — overview',
-      url: tag('https://learn.microsoft.com/en-us/microsoft-copilot-studio/'),
-    },
-    {
-      label: 'Copilot Studio — 60-day free trial',
-      url: tag('https://learn.microsoft.com/en-us/microsoft-copilot-studio/requirements-licensing-subscriptions#copilot-studio-for-microsoft-teams-plans'),
-    },
-    {
-      label: 'Copilot Studio — access options & getting started',
-      url: tag('https://learn.microsoft.com/en-us/microsoft-copilot-studio/fundamentals-what-is-copilot-studio#access-copilot-studio'),
-    },
-    SINGLE_VS_MULTI,
-    SOURCE_ARTICLE,
+    { label: 'Microsoft Learn: Copilot', url: 'https://learn.microsoft.com/copilot' },
+    { label: 'Copilot Learning Center', url: 'https://microsoft.com/microsoft-365/copilot-learning-center' },
+    { label: 'Microsoft 365 Copilot overview', url: 'https://microsoft.com/microsoft-365-copilot' },
+    { label: 'Copilot home', url: 'https://copilot.microsoft.com' },
   ],
-
   foundry: [
-    {
-      label: 'Microsoft Foundry — overview',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-azure-ai-foundry'),
-    },
-    {
-      label: 'Foundry — create your first agent (quickstart)',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/agents/quickstart'),
-    },
-    {
-      label: 'Declarative vs. hosted agents (types of agents)',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/development-lifecycle'),
-    },
-    {
-      label: 'Hosted agents — managed runtime, code-first',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/hosted-agents'),
-    },
-    {
-      label: 'Foundry Workflows — multi-agent orchestration',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/workflow'),
-    },
-    {
-      label: 'Foundry Tool catalog (MCP, OpenAPI, Logic Apps, Functions)',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/tool-catalog'),
-    },
-    {
-      label: 'Foundry model catalog (OpenAI, Anthropic, Meta, Mistral)',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-studio/how-to/model-catalog'),
-    },
-    {
-      label: 'Basic vs. standard agent setup',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/agents/environment-setup#choose-your-setup'),
-    },
-    {
-      label: 'Standard agent setup (private networking, enterprise controls)',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/standard-agent-setup'),
-    },
-    {
-      label: 'Foundry playground (prototype before you commit)',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/concept-playgrounds'),
-    },
-    SINGLE_VS_MULTI,
-    SOURCE_ARTICLE,
+    { label: 'Azure homepage', url: 'https://azure.microsoft.com' },
+    { label: 'Azure for students', url: 'https://azure.microsoft.com/free/students' },
+    { label: 'Microsoft Learn for developers', url: 'https://learn.microsoft.com/developer' },
+    { label: 'Microsoft Developer hub', url: 'https://developer.microsoft.com' },
+    { label: 'DevBlogs', url: 'https://devblogs.microsoft.com' },
   ],
-
   foundry_hosted_byo: [
-    {
-      label: 'Hosted agents — bring your own model with a managed runtime',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/hosted-agents'),
-    },
-    {
-      label: 'Foundry model catalog (OpenAI, Anthropic, Meta, Mistral, open-source)',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-studio/how-to/model-catalog'),
-    },
-    {
-      label: 'Microsoft Foundry — overview',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-azure-ai-foundry'),
-    },
-    {
-      label: 'Standard agent setup (enterprise data controls)',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/standard-agent-setup'),
-    },
-    {
-      label: 'Foundry Tool catalog',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/tool-catalog'),
-    },
-    SOURCE_ARTICLE,
+    { label: 'Azure homepage', url: 'https://azure.microsoft.com' },
+    { label: 'Azure for students', url: 'https://azure.microsoft.com/free/students' },
+    { label: 'Microsoft Learn for developers', url: 'https://learn.microsoft.com/developer' },
+    { label: 'Microsoft Developer hub', url: 'https://developer.microsoft.com' },
   ],
-
   iaas: [
-    {
-      label: 'Azure Container Apps — serverless GPU (small language models)',
-      url: tag('https://learn.microsoft.com/en-us/azure/container-apps/gpu-serverless-overview'),
-    },
-    {
-      label: 'Azure Kubernetes Service (AKS) — large GPU clusters',
-      url: tag('https://learn.microsoft.com/en-us/azure/aks/what-is-aks'),
-    },
-    {
-      label: 'Microsoft Foundry — overview (for managed-runtime comparison)',
-      url: tag('https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-azure-ai-foundry'),
-    },
-    SINGLE_VS_MULTI,
-    SOURCE_ARTICLE,
+    { label: 'Azure homepage', url: 'https://azure.microsoft.com' },
+    { label: 'Azure for students', url: 'https://azure.microsoft.com/free/students' },
+    { label: 'Microsoft Learn for developers', url: 'https://learn.microsoft.com/developer' },
+    { label: 'Microsoft Developer hub', url: 'https://developer.microsoft.com' },
   ],
 };
 
-// Defensive guard — runs at module load. Any URL in LINKS that is missing the
-// MSA tracking tag crashes the build immediately so an untagged link can never
-// ship to production.
-(function assertEveryUrlIsTagged(node) {
-  if (Array.isArray(node)) {
-    node.forEach(assertEveryUrlIsTagged);
-    return;
-  }
-  if (node && typeof node === 'object') {
-    if ('url' in node) {
-      if (typeof node.url !== 'string' || !node.url.includes(MSA_PARAM)) {
-        throw new Error(
-          `links.js: URL is missing the MSA tracking tag: ${node.url}`,
-        );
+export const LINKS = Object.fromEntries(
+  Object.entries(RAW_LINKS).map(([key, items]) => [
+    key,
+    items.map((item) => ({ ...item, url: tag(item.url) })),
+  ]),
+);
+
+// ---------- MSA eligibility guard ----------
+// Runs once at module load. Any URL that is missing the tag, contains a locale
+// segment, or does not start with an MSA-eligible prefix crashes the build.
+
+const ELIGIBLE_PREFIXES = [
+  'https://azure.microsoft.com',
+  'https://code.visualstudio.com',
+  'https://developer.microsoft.com',
+  'https://devblogs.microsoft.com',
+  'https://dotnet.microsoft.com',
+  'https://learn.microsoft.com/developer',
+  'https://learn.microsoft.com/copilot',
+  'https://learn.microsoft.com/fabric',
+  'https://learn.microsoft.com/startups',
+  'https://learn.microsoft.com/training/topics/startups',
+  'https://learn.microsoft.com/power-automate',
+  'https://learn.microsoft.com/power-apps',
+  'https://learn.microsoft.com/power-bi',
+  'https://learn.microsoft.com/power-platform',
+  'https://learn.microsoft.com/power-pages',
+  'https://microsoft.com/microsoft-cloud/blog',
+  'https://microsoft.com/startups',
+  'https://microsoft.com/microsoft-365-copilot',
+  'https://microsoft.com/microsoft-365/copilot-learning-center',
+  'https://microsoft.com/microsoft-copilot/for-individuals',
+  'https://microsoft.com/microsoft-fabric',
+  'https://microsoft.com/power-platform',
+  'https://microsoft.com/insidetrack',
+  'https://imaginecup.microsoft.com',
+  'https://copilot.microsoft.com',
+  'https://blog.fabric.microsoft.com',
+  'https://community.fabric.microsoft.com',
+  'https://community.powerplatform.com',
+  'https://powerbi.microsoft.com/blog',
+  'https://events.microsoft.com',
+  'https://reactor.microsoft.com',
+  'https://studentambassadors.microsoft.com',
+  'https://techcommunity.microsoft.com',
+];
+
+// Reject /learn.microsoft.com/plans/... explicitly — MSA rules exclude Learn Plans.
+const EXCLUDED_PATTERNS = [/^https?:\/\/learn\.microsoft\.com\/plans(\/|$|\?|#)/];
+
+// A locale segment anywhere in the path renders the URL ineligible.
+const LOCALE_ANYWHERE = /\/[a-z]{2}-[a-z]{2}(\/|\?|#|$)/;
+
+function matchesEligiblePrefix(url) {
+  return ELIGIBLE_PREFIXES.some((prefix) => {
+    if (!url.startsWith(prefix)) return false;
+    const remainder = url.slice(prefix.length);
+    // Require a clean boundary so /microsoft-365-copilot does not silently
+    // match /microsoft-365-copilot-evil or similar accidental overlaps.
+    return (
+      remainder === '' ||
+      remainder.startsWith('/') ||
+      remainder.startsWith('?') ||
+      remainder.startsWith('#')
+    );
+  });
+}
+
+(function assertMsaCompliance() {
+  const failures = [];
+  for (const [key, items] of Object.entries(LINKS)) {
+    items.forEach((item) => {
+      const url = item.url;
+      if (typeof url !== 'string') {
+        failures.push(`[${key}] non-string url: ${String(url)}`);
+        return;
       }
-    }
-    Object.values(node).forEach(assertEveryUrlIsTagged);
+      if (!url.includes(MSA_PARAM)) {
+        failures.push(`[${key}] missing MSA Contributor ID: ${url}`);
+      }
+      if (LOCALE_ANYWHERE.test(url)) {
+        failures.push(`[${key}] contains a locale segment: ${url}`);
+      }
+      if (EXCLUDED_PATTERNS.some((re) => re.test(url))) {
+        failures.push(`[${key}] matches an excluded pattern (e.g. /plans/): ${url}`);
+      }
+      if (!matchesEligiblePrefix(url)) {
+        failures.push(`[${key}] not on the MSA-eligible prefix list: ${url}`);
+      }
+    });
   }
-})(LINKS);
+  if (failures.length > 0) {
+    throw new Error(
+      'MSA eligibility check failed for ' +
+        failures.length +
+        ' URL(s):\n  ' +
+        failures.join('\n  '),
+    );
+  }
+})();

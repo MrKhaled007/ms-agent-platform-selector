@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { decide, multiAgentVerdict } from '../logic/decisionEngine.js';
 import { RECOMMENDATIONS } from '../logic/recommendations.js';
-import { LINKS } from '../logic/links.js';
+import { LINKS, SOURCE_LINK } from '../logic/links.js';
 import LinkCard from './LinkCard.jsx';
 import ValidationCallout from './ValidationCallout.jsx';
 
@@ -134,6 +134,12 @@ export default function RecommendationPage({ answers, onStartOver }) {
           {toast}
         </div>
       )}
+
+      <p className="source-footer">
+        <a href={SOURCE_LINK.url} target="_blank" rel="noopener noreferrer">
+          {SOURCE_LINK.label}
+        </a>
+      </p>
     </div>
   );
 }

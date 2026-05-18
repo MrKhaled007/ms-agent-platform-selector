@@ -561,6 +561,25 @@ pre {
   padding-top: 8px;
 }
 
+/* Source footer — quiet citation, no MSA tag */
+.source-footer {
+  font-size: 12px;
+  color: var(--ms-text-tertiary);
+  text-align: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ms-border);
+}
+
+.source-footer a {
+  color: var(--ms-text-tertiary);
+  text-decoration: underline;
+}
+
+.source-footer a:hover {
+  color: var(--ms-text-secondary);
+}
+
 /* Toast */
 .toast {
   position: fixed;

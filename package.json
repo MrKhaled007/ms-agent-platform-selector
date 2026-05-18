@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "prebuild": "node --input-type=module -e \"import('./src/logic/links.js')\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
