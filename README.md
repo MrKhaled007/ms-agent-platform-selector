@@ -6,11 +6,8 @@ An interactive decision-tree tool that helps you choose the right Microsoft AI a
 
 ## 🔗 Live Demo
 
-Coming soon (deploying to Netlify)
+[Coming soon (deploying to Netlify)](https://ms-agent-selector.netlify.app/)
 
-## 📸 Screenshot
-
-_Screenshot coming after deploy._
 
 ## 🎯 Why this exists
 
